@@ -7,7 +7,7 @@ import {
   LinearScale,
   Tooltip,
 } from 'chart.js'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, Doughnut } from 'react-chartjs-2'
 import { getDashboard } from '../api/dashboard'
 import MetricCard from '../components/MetricCard'
@@ -17,32 +17,50 @@ import { currency, formatDateBR, formatTimeShort } from '../utils/format'
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend)
 
 export default function DashboardPage() {
+  const currentMonth = new Date().toISOString().slice(0, 7)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth)
   const [dashboard, setDashboard] = useState({
     upcoming_events: [],
-    balance: 0,
+    balance_summary: {
+      current_balance: 0,
+      future_expenses: 0,
+      projected_balance: 0,
+      future_income: 0,
+      current_transactions: [],
+      future_expense_items: [],
+      future_income_items: [],
+      projected_items: [],
+    },
     expenses_by_category: [],
     monthly_summary: [],
   })
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true)
     setError('')
 
     try {
-      const data = await getDashboard()
+      const [year, month] = selectedMonth.split('-').map(Number)
+      const monthStart = new Date(year, month - 1, 1)
+      const monthEnd = new Date(year, month, 0)
+
+      const data = await getDashboard({
+        start_date: monthStart.toISOString().slice(0, 10),
+        end_date: monthEnd.toISOString().slice(0, 10),
+      })
       setDashboard(data)
     } catch {
       setError('Nao foi possivel carregar o dashboard.')
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedMonth])
 
   useEffect(() => {
     loadData()
-  }, [])
+  }, [loadData])
 
   const expenseChart = useMemo(() => {
     const labels = dashboard.expenses_by_category.map((item) => item.category)
@@ -89,21 +107,61 @@ export default function DashboardPage() {
         title="Dashboard"
         description="Visao consolidada de agenda e financas pessoais."
         action={
-          <button
-            type="button"
-            onClick={loadData}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            Atualizar
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={loadData}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+            >
+              Atualizar
+            </button>
+            <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
+              <span>Mes</span>
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(event) => setSelectedMonth(event.target.value)}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </label>
+          </div>
         }
       />
 
       {error && <p className="mb-4 rounded-lg bg-red-100 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <MetricCard title="Saldo Atual" value={currency(dashboard.balance)} subtitle="Calculado em tempo real" />
-        <MetricCard title="Proximos Eventos" value={String(dashboard.upcoming_events.length)} subtitle="Nos proximos dias" />
+        <MetricCard
+          title="Saldo Atual"
+          value={currency(dashboard.balance_summary.current_balance)}
+          subtitle="Movimentos do mes selecionado ate hoje"
+          details={dashboard.balance_summary.current_transactions}
+          detailsTitle="Transacoes no saldo atual"
+        />
+        <MetricCard
+          title="Despesas Futuras"
+          value={currency(dashboard.balance_summary.future_expenses)}
+          subtitle="Apenas do mes selecionado"
+          details={dashboard.balance_summary.future_expense_items}
+          detailsTitle="Despesas consideradas"
+        />
+        <MetricCard
+          title="Saldo Projetado"
+          value={currency(dashboard.balance_summary.projected_balance)}
+          subtitle="Saldo do mes selecionado"
+          details={dashboard.balance_summary.projected_items}
+          detailsTitle="Movimentos futuros projetados"
+        />
+      </div>
+
+      <div className="mt-4 grid gap-4 xl:grid-cols-2">
+        <MetricCard
+          title="Receita Futura"
+          value={currency(dashboard.balance_summary.future_income)}
+          subtitle="Entradas que ainda vao acontecer"
+          details={dashboard.balance_summary.future_income_items}
+          detailsTitle="Receitas consideradas"
+        />
         <MetricCard
           title="Evento Mais Proximo"
           value={nextEvent?.title ?? 'Nenhum evento'}

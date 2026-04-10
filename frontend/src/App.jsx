@@ -6,6 +6,7 @@ import CategoriesPage from './pages/CategoriesPage'
 import DashboardPage from './pages/DashboardPage'
 import FinancialGoalsPage from './pages/FinancialGoalsPage'
 import LoginPage from './pages/LoginPage'
+import InvestmentsPage from './pages/InvestmentsPage'
 import NotesPage from './pages/NotesPage'
 import RegisterPage from './pages/RegisterPage'
 import ReportsPage from './pages/ReportsPage'
@@ -55,6 +56,7 @@ function App() {
         <Route path="/anotacoes" element={<NotesPage />} />
         <Route path="/relatorios" element={<ReportsPage />} />
         <Route path="/metas-financeiras" element={<FinancialGoalsPage />} />
+        <Route path="/investimentos" element={<InvestmentsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

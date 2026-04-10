@@ -7,6 +7,7 @@ use App\Http\Requests\TransactionStoreRequest;
 use App\Http\Requests\TransactionUpdateRequest;
 use App\Models\RecurringRule;
 use App\Models\Transaction;
+use App\Services\BalanceSummaryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -14,24 +15,28 @@ use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, BalanceSummaryService $balanceSummaryService): JsonResponse
     {
+        $today = Carbon::today();
+        $periodStart = $request->filled('start')
+            ? Carbon::parse((string) $request->input('start'))->startOfDay()
+            : $today->copy()->startOfMonth();
+        $periodEnd = $request->filled('end')
+            ? Carbon::parse((string) $request->input('end'))->endOfDay()
+            : $today->copy()->endOfMonth();
+
         $transactions = $request->user()
             ->transactions()
             ->with('category:id,name,color')
-            ->when($request->filled('start') && $request->filled('end'), function ($query) use ($request) {
-                $query->whereBetween('transaction_date', [$request->string('start'), $request->string('end')]);
-            })
+            ->whereBetween('transaction_date', [$periodStart->toDateString(), $periodEnd->toDateString()])
             ->orderByDesc('transaction_date')
             ->get();
 
-        $balance = (float) $request->user()->transactions()
-            ->selectRaw("COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE -amount END), 0) as balance")
-            ->value('balance');
+        $balanceSummary = $balanceSummaryService->summarize($request->user(), $today, $periodStart, $periodEnd);
 
         return response()->json([
             'data' => $transactions,
-            'balance' => $balance,
+            'balance_summary' => $balanceSummary,
         ]);
     }
 

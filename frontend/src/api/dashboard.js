@@ -1,6 +1,6 @@
 import client from './client'
 
-export async function getDashboard() {
-  const { data } = await client.get('/dashboard')
+export async function getDashboard(params = {}) {
+  const { data } = await client.get('/dashboard', { params })
   return data
 }

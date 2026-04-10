@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { listCategories } from '../api/categories'
 import { createTransaction, deleteTransaction, listTransactions, updateTransaction } from '../api/transactions'
 import Modal from '../components/Modal'
@@ -17,30 +17,43 @@ const initialForm = {
 }
 
 export default function TransactionsPage() {
+  const currentMonth = new Date().toISOString().slice(0, 7)
   const [transactions, setTransactions] = useState([])
   const [categories, setCategories] = useState([])
-  const [balance, setBalance] = useState(0)
+  const [balanceSummary, setBalanceSummary] = useState({
+    current_balance: 0,
+    future_expenses: 0,
+    projected_balance: 0,
+  })
   const [error, setError] = useState('')
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth)
   const [form, setForm] = useState(initialForm)
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setError('')
     try {
-      const [txResponse, categoriesResponse] = await Promise.all([listTransactions(), listCategories()])
+      const [year, month] = selectedMonth.split('-').map(Number)
+      const monthStart = new Date(year, month - 1, 1).toISOString().slice(0, 10)
+      const monthEnd = new Date(year, month, 0).toISOString().slice(0, 10)
+
+      const [txResponse, categoriesResponse] = await Promise.all([
+        listTransactions({ start: monthStart, end: monthEnd }),
+        listCategories(),
+      ])
       setTransactions(txResponse.data)
-      setBalance(txResponse.balance)
+      setBalanceSummary(txResponse.balance_summary)
       setCategories(categoriesResponse)
     } catch {
       setError('Nao foi possivel carregar transacoes.')
     }
-  }
+  }, [selectedMonth])
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [fetchData])
 
   const categorizedOptions = useMemo(
     () => categories.map((item) => ({ value: String(item.id), label: item.name })),
@@ -116,13 +129,24 @@ export default function TransactionsPage() {
         title="Transacoes"
         description="Controle receitas e despesas com recorrencia opcional."
         action={
-          <button
-            type="button"
-            onClick={openCreate}
-            className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-800"
-          >
-            Nova transacao
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={openCreate}
+              className="rounded-lg bg-sky-700 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-800"
+            >
+              Nova transacao
+            </button>
+            <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
+              <span>Mes</span>
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(event) => setSelectedMonth(event.target.value)}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </label>
+          </div>
         }
       />
 
@@ -130,10 +154,24 @@ export default function TransactionsPage() {
 
       <article className="rounded-2xl border border-white/60 bg-white p-4 shadow-soft">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Saldo atual</p>
-        <p className={`mt-2 text-3xl font-black ${Number(balance) >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
-          {currency(balance)}
+        <p className={`mt-2 text-3xl font-black ${Number(balanceSummary.current_balance) >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+          {currency(balanceSummary.current_balance)}
         </p>
       </article>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <article className="rounded-2xl border border-white/60 bg-white p-4 shadow-soft">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Despesas Futuras</p>
+          <p className="mt-2 text-2xl font-bold text-red-700">{currency(balanceSummary.future_expenses)}</p>
+        </article>
+
+        <article className="rounded-2xl border border-white/60 bg-white p-4 shadow-soft">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Saldo Projetado</p>
+          <p className={`mt-2 text-2xl font-bold ${Number(balanceSummary.projected_balance) >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+            {currency(balanceSummary.projected_balance)}
+          </p>
+        </article>
+      </div>
 
       <div className="mt-4 overflow-x-auto rounded-2xl border border-white/60 bg-white shadow-soft">
         <table className="min-w-full text-sm">
