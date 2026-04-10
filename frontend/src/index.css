@@ -18,8 +18,12 @@
   body {
     margin: 0;
     font-family: 'Manrope', 'Segoe UI', sans-serif;
-    @apply bg-slate-100 text-slate-900 antialiased;
+    @apply bg-slate-100 text-slate-900 antialiased transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100;
   }
+}
+
+::selection {
+  background: rgb(14 165 233 / 0.28);
 }
 
 .fc .fc-toolbar-title {
@@ -36,4 +40,86 @@
 .fc .fc-button:hover,
 .fc .fc-button:focus {
   background-color: rgb(7 89 133);
+}
+
+.dark .fc {
+  color: rgb(226 232 240);
+}
+
+.dark .fc,
+.dark .fc .fc-scrollgrid,
+.dark .fc .fc-view-harness,
+.dark .fc .fc-daygrid-body,
+.dark .fc .fc-timegrid-body,
+.dark .fc .fc-timegrid-slot,
+.dark .fc .fc-daygrid-day-frame {
+  background-color: rgb(15 23 42);
+}
+
+.dark .fc-theme-standard td,
+.dark .fc-theme-standard th,
+.dark .fc-theme-standard .fc-scrollgrid {
+  border-color: rgb(51 65 85);
+}
+
+.dark .fc .fc-daygrid-day-number,
+.dark .fc .fc-col-header-cell-cushion {
+  color: rgb(226 232 240);
+}
+
+.dark .fc .fc-timegrid-axis-cushion,
+.dark .fc .fc-timegrid-slot-label-cushion,
+.dark .fc .fc-list-event-time {
+  color: rgb(203 213 225);
+}
+
+.dark .fc .fc-daygrid-day.fc-day-today {
+  background: rgb(14 116 144 / 0.22);
+}
+
+.dark .fc .fc-event {
+  border: 1px solid rgb(14 116 144);
+  background: linear-gradient(135deg, rgb(14 116 144), rgb(8 145 178));
+  color: rgb(240 249 255);
+}
+
+.dark .fc .fc-event .fc-event-title,
+.dark .fc .fc-event .fc-event-time {
+  color: rgb(240 249 255);
+}
+
+.dark .fc .fc-day-other .fc-daygrid-day-number {
+  color: rgb(100 116 139);
+}
+
+.dark .fc .fc-button {
+  background-color: rgb(14 116 144);
+}
+
+.dark .fc .fc-button:hover,
+.dark .fc .fc-button:focus {
+  background-color: rgb(8 145 178);
+}
+
+.dark .ag-modal label,
+.dark .auth-card label {
+  color: rgb(203 213 225) !important;
+}
+
+.dark .ag-modal input,
+.dark .ag-modal select,
+.dark .ag-modal textarea,
+.dark .auth-card input,
+.dark .auth-card select,
+.dark .auth-card textarea {
+  background-color: rgb(15 23 42) !important;
+  border-color: rgb(71 85 105) !important;
+  color: rgb(241 245 249) !important;
+}
+
+.dark .ag-modal input::placeholder,
+.dark .ag-modal textarea::placeholder,
+.dark .auth-card input::placeholder,
+.dark .auth-card textarea::placeholder {
+  color: rgb(148 163 184) !important;
 }

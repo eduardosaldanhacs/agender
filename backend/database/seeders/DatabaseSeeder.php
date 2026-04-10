@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\FinancialGoal;
+use App\Models\Note;
 use App\Models\RecurringRule;
 use App\Models\Transaction;
 use App\Models\User;
@@ -89,6 +91,22 @@ class DatabaseSeeder extends Seeder
             'reminder_sent' => false,
         ]);
 
+        Note::create([
+            'user_id' => $user->id,
+            'title' => 'Checklist da semana',
+            'content' => "- Pagar aluguel\n- Revisar metas\n- Organizar comprovantes",
+            'color' => '#FEF3C7',
+            'is_pinned' => true,
+        ]);
+
+        Note::create([
+            'user_id' => $user->id,
+            'title' => 'Ideias de economia',
+            'content' => "1. Renegociar plano de internet\n2. Consolidar assinaturas",
+            'color' => '#DBEAFE',
+            'is_pinned' => false,
+        ]);
+
         RecurringRule::create([
             'user_id' => $user->id,
             'category_id' => $housing->id,
@@ -98,6 +116,30 @@ class DatabaseSeeder extends Seeder
             'frequency' => 'monthly',
             'next_run_date' => Carbon::today()->addMonth()->startOfMonth()->toDateString(),
             'is_active' => true,
+        ]);
+
+        FinancialGoal::create([
+            'user_id' => $user->id,
+            'title' => 'Reserva de emergencia',
+            'goal_type' => 'saving',
+            'target_amount' => 12000,
+            'current_amount' => 3500,
+            'start_date' => Carbon::today()->startOfYear()->toDateString(),
+            'end_date' => Carbon::today()->endOfYear()->toDateString(),
+            'status' => 'active',
+            'notes' => 'Aporte mensal minimo de R$ 800.',
+        ]);
+
+        FinancialGoal::create([
+            'user_id' => $user->id,
+            'category_id' => $leisure->id,
+            'title' => 'Limite de lazer mensal',
+            'goal_type' => 'expense_limit',
+            'target_amount' => 600,
+            'current_amount' => 180,
+            'start_date' => Carbon::today()->startOfMonth()->toDateString(),
+            'end_date' => Carbon::today()->endOfMonth()->toDateString(),
+            'status' => 'active',
         ]);
     }
 }

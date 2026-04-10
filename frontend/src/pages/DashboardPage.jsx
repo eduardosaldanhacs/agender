@@ -12,7 +12,7 @@ import { Bar, Doughnut } from 'react-chartjs-2'
 import { getDashboard } from '../api/dashboard'
 import MetricCard from '../components/MetricCard'
 import PageHeader from '../components/PageHeader'
-import { currency } from '../utils/format'
+import { currency, formatDateBR, formatTimeShort } from '../utils/format'
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend)
 
@@ -107,7 +107,7 @@ export default function DashboardPage() {
         <MetricCard
           title="Evento Mais Proximo"
           value={nextEvent?.title ?? 'Nenhum evento'}
-          subtitle={nextEvent ? `${nextEvent.event_date} ${String(nextEvent.event_time).slice(0, 5)}` : 'Cadastre eventos no calendario'}
+          subtitle={nextEvent ? `${formatDateBR(nextEvent.event_date)} as ${formatTimeShort(nextEvent.event_time)}` : 'Cadastre eventos no calendario'}
         />
       </div>
 
@@ -156,7 +156,7 @@ export default function DashboardPage() {
           {dashboard.upcoming_events.map((event) => (
             <li key={event.id} className="rounded-lg border border-slate-200 px-3 py-3">
               <p className="font-semibold text-slate-900">{event.title}</p>
-              <p className="text-sm text-slate-600">{event.event_date} as {String(event.event_time).slice(0, 5)}</p>
+              <p className="text-sm text-slate-600">{formatDateBR(event.event_date)} as {formatTimeShort(event.event_time)}</p>
             </li>
           ))}
         </ul>

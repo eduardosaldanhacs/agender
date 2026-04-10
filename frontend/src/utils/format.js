@@ -5,6 +5,27 @@ export function currency(value) {
   }).format(Number(value || 0))
 }
 
+function extractDatePart(value) {
+  if (!value) return ''
+  const raw = String(value)
+  return raw.includes('T') ? raw.slice(0, 10) : raw.slice(0, 10)
+}
+
+export function formatDateBR(value) {
+  const datePart = extractDatePart(value)
+  if (!datePart || !datePart.includes('-')) return ''
+
+  const [year, month, day] = datePart.split('-')
+  if (!year || !month || !day) return ''
+
+  return `${day}/${month}/${year}`
+}
+
+export function formatTimeShort(value) {
+  if (!value) return ''
+  return String(value).slice(0, 5)
+}
+
 export function toDateInput(value) {
   if (!value) return ''
   const date = new Date(value)

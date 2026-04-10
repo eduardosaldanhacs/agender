@@ -140,7 +140,7 @@ export default function CalendarPage() {
 
       {error && <p className="mb-4 rounded-lg bg-red-100 px-3 py-2 text-sm text-red-700">{error}</p>}
 
-      <div className="overflow-hidden rounded-2xl border border-white/60 bg-white p-4 shadow-soft">
+      <div className="overflow-hidden rounded-2xl border border-white/60 bg-white p-4 shadow-soft transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/85">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"

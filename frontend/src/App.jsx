@@ -4,8 +4,11 @@ import AppLayout from './layouts/AppLayout'
 import CalendarPage from './pages/CalendarPage'
 import CategoriesPage from './pages/CategoriesPage'
 import DashboardPage from './pages/DashboardPage'
+import FinancialGoalsPage from './pages/FinancialGoalsPage'
 import LoginPage from './pages/LoginPage'
+import NotesPage from './pages/NotesPage'
 import RegisterPage from './pages/RegisterPage'
+import ReportsPage from './pages/ReportsPage'
 import TransactionsPage from './pages/TransactionsPage'
 
 function AuthOnlyRoute({ children }) {
@@ -49,6 +52,9 @@ function App() {
         <Route path="/calendario" element={<CalendarPage />} />
         <Route path="/transacoes" element={<TransactionsPage />} />
         <Route path="/categorias" element={<CategoriesPage />} />
+        <Route path="/anotacoes" element={<NotesPage />} />
+        <Route path="/relatorios" element={<ReportsPage />} />
+        <Route path="/metas-financeiras" element={<FinancialGoalsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

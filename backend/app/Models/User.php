@@ -67,4 +67,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(RecurringRule::class);
     }
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(Note::class);
+    }
+
+    public function financialGoals(): HasMany
+    {
+        return $this->hasMany(FinancialGoal::class);
+    }
 }

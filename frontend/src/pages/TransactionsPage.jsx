@@ -3,7 +3,7 @@ import { listCategories } from '../api/categories'
 import { createTransaction, deleteTransaction, listTransactions, updateTransaction } from '../api/transactions'
 import Modal from '../components/Modal'
 import PageHeader from '../components/PageHeader'
-import { currency, toDateInput } from '../utils/format'
+import { currency, formatDateBR, toDateInput } from '../utils/format'
 
 const initialForm = {
   description: '',
@@ -155,7 +155,7 @@ export default function TransactionsPage() {
               >
                 <td className="px-4 py-3 font-medium text-slate-900">{tx.description}</td>
                 <td className="px-4 py-3">{tx.category?.name ?? '-'}</td>
-                <td className="px-4 py-3">{tx.transaction_date}</td>
+                <td className="px-4 py-3">{formatDateBR(tx.transaction_date)}</td>
                 <td className="px-4 py-3">{tx.type === 'income' ? 'Entrada' : 'Saida'}</td>
                 <td className={`px-4 py-3 text-right font-semibold ${tx.type === 'income' ? 'text-emerald-700' : 'text-red-700'}`}>
                   {tx.type === 'income' ? '+' : '-'} {currency(tx.amount)}
