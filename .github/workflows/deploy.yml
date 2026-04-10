@@ -59,5 +59,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASS }}
+          port: 21
+          protocol: ftp
           server-dir: ${{ secrets.FTP_DIR }}
           local-dir: backend/
