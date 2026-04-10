@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    @apply bg-slate-100 text-slate-900 antialiased;
+  }
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.fc .fc-button {
+  border-radius: 0.6rem;
+  border-width: 0;
+  background-color: rgb(3 105 161);
+}
+
+.fc .fc-button:hover,
+.fc .fc-button:focus {
+  background-color: rgb(7 89 133);
+}
