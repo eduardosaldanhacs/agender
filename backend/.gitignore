@@ -21,3 +21,56 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+
+# ========================
+# GERAL
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# LARAVEL
+# ========================
+backend/vendor/
+backend/node_modules/
+backend/.env
+backend/.env.*
+backend/storage/*.key
+backend/storage/logs/*
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/bootstrap/cache/*.php
+
+# ========================
+# REACT (Vite / CRA)
+# ========================
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# ========================
+# LOGS
+# ========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# IDE
+# ========================
+.vscode/
+.idea/
+
+# ========================
+# TESTES / CACHE
+# ========================
+coverage/
+.cache/
+
+# ========================
+# OUTROS
+# ========================
+.env
