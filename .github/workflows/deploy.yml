@@ -1,5 +1,63 @@
-with:
-  server: ${{ secrets.FTP_SERVER }}
-  username: ${{ secrets.FTP_USER }}
-  password: ${{ secrets.FTP_PASS }}
-  server-dir: ${{ secrets.FTP_DIR }}
+name: Deploy Laravel + React
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      # ========================
+      # BACKEND (Laravel)
+      # ========================
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+
+      - name: Instalar dependências PHP
+        working-directory: backend
+        run: |
+          composer install --no-dev --optimize-autoloader
+
+      # ========================
+      # FRONTEND (React)
+      # ========================
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Instalar dependências Node
+        working-directory: frontend
+        run: npm install
+
+      - name: Build React
+        working-directory: frontend
+        run: npm run build
+
+      # ========================
+      # COPIAR BUILD PARA LARAVEL
+      # ========================
+      - name: Copiar build para public
+        run: |
+          rm -rf backend/public/*
+          cp -r frontend/dist/* backend/public/
+
+      # ========================
+      # DEPLOY FTP
+      # ========================
+      - name: Enviar via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          server-dir: ${{ secrets.FTP_DIR }}
+          local-dir: backend/
