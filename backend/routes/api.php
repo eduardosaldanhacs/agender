@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AcademicController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EventController;
@@ -28,4 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('notes', NoteController::class);
     Route::get('reports', [ReportController::class, 'index']);
     Route::apiResource('financial-goals', FinancialGoalController::class);
+    Route::get('disciplinas', [AcademicController::class, 'index']);
+    Route::get('disciplinas/disponiveis', [AcademicController::class, 'disponiveis']);
+    Route::post('disciplinas/status', [AcademicController::class, 'status']);
+    Route::get('disciplinas/progresso', [AcademicController::class, 'progresso']);
+    Route::get('disciplinas/liberadas/{disciplina}', [AcademicController::class, 'liberadas']);
 });

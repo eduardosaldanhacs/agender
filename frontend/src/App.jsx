@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppLayout from './layouts/AppLayout'
+import AcademicPlanner from './pages/AcademicPlanner'
 import CalendarPage from './pages/CalendarPage'
 import CategoriesPage from './pages/CategoriesPage'
 import DashboardPage from './pages/DashboardPage'
@@ -57,6 +58,7 @@ function App() {
         <Route path="/relatorios" element={<ReportsPage />} />
         <Route path="/metas-financeiras" element={<FinancialGoalsPage />} />
         <Route path="/investimentos" element={<InvestmentsPage />} />
+        <Route path="/planejamento-academico" element={<AcademicPlanner />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -1,4 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import client from '../api/client'
 import { useAuth } from '../hooks/useAuth'
 import ThemeToggleButton from '../components/ThemeToggleButton'
@@ -67,6 +68,22 @@ function MoneyIcon({ className = '' }) {
   )
 }
 
+function AcademicIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
+      <path fill="currentColor" d="M4 4a3 3 0 0 1 3-3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 0 0 2h12a1 1 0 1 1 0 2H7a3 3 0 0 1-3-3V4Zm3-1a1 1 0 0 0-1 1v13.17A2.98 2.98 0 0 1 7 17h11V3H7Zm3 4h5a1 1 0 1 1 0 2h-5a1 1 0 0 1 0-2Zm0 4h5a1 1 0 1 1 0 2h-5a1 1 0 1 1 0-2Z" />
+    </svg>
+  )
+}
+
+function MenuToggleIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
+      <path fill="currentColor" d="M4 6a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 6a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm1 5a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2H5Z" />
+    </svg>
+  )
+}
+
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
   { to: '/calendario', label: 'Calendario', icon: CalendarIcon },
@@ -76,11 +93,19 @@ const navLinks = [
   { to: '/relatorios', label: 'Relatorios', icon: ChartIcon },
   { to: '/metas-financeiras', label: 'Metas Financeiras', icon: TargetIcon },
   { to: '/investimentos', label: 'Investimentos', icon: MoneyIcon },
+  { to: '/planejamento-academico', label: 'Academico', icon: AcademicIcon },
 ]
 
 export default function AppLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('agender_sidebar_collapsed') === 'true'
+  })
+
+  useEffect(() => {
+    localStorage.setItem('agender_sidebar_collapsed', String(isSidebarCollapsed))
+  }, [isSidebarCollapsed])
 
   const handleLogout = async () => {
     try {
@@ -95,16 +120,37 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-      <div className="mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 md:grid-cols-[260px_1fr]">
-        <aside className="relative overflow-hidden bg-gradient-to-b from-cyan-700 via-sky-700 to-blue-900 px-4 py-6 text-white md:px-6">
+      <div
+        className={`mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 transition-[grid-template-columns] duration-300 ${
+          isSidebarCollapsed ? 'md:grid-cols-[88px_1fr]' : 'md:grid-cols-[260px_1fr]'
+        }`}
+      >
+        <aside
+          className={`relative overflow-hidden bg-gradient-to-b from-cyan-700 via-sky-700 to-blue-900 px-4 py-6 text-white transition-all duration-300 ${
+            isSidebarCollapsed ? 'md:px-4' : 'md:px-6'
+          }`}
+        >
           <div className="pointer-events-none absolute -left-10 top-0 h-40 w-40 rounded-full bg-cyan-300/20 blur-2xl" />
           <div className="pointer-events-none absolute bottom-8 right-0 h-32 w-32 rounded-full bg-sky-300/20 blur-2xl" />
 
-          <Link to="/dashboard" className="relative text-2xl font-black tracking-tight">
-            agender
-          </Link>
+          <div className="relative flex items-center justify-between gap-2">
+            <Link to="/dashboard" className={`text-2xl font-black tracking-tight ${isSidebarCollapsed ? 'md:hidden' : ''}`}>
+              agender
+            </Link>
+            <Link to="/dashboard" className={`hidden text-2xl font-black tracking-tight ${isSidebarCollapsed ? 'md:block' : ''}`}>
+              a
+            </Link>
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed((prev) => !prev)}
+              title={isSidebarCollapsed ? 'Expandir menu' : 'Recolher menu'}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/30 bg-white/10 text-cyan-50 transition hover:bg-white/20"
+            >
+              <MenuToggleIcon className="h-5 w-5" />
+            </button>
+          </div>
 
-          <p className="relative mt-2 text-sm text-cyan-100">Mini ERP pessoal</p>
+          <p className={`relative mt-2 text-sm text-cyan-100 ${isSidebarCollapsed ? 'md:hidden' : ''}`}>Mini ERP pessoal</p>
 
           <ThemeToggleButton className="relative mt-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/30 bg-white/10 text-cyan-50 transition hover:bg-white/20" />
 
@@ -113,29 +159,31 @@ export default function AppLayout() {
               <NavLink
                 key={item.to}
                 to={item.to}
+                title={item.label}
                 className={({ isActive }) =>
                   `block rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
                     isActive ? 'bg-white/20 text-white' : 'text-cyan-50 hover:bg-white/10 hover:text-white'
-                  }`
+                  } ${isSidebarCollapsed ? 'md:px-0' : ''}`
                 }
               >
-                <span className="flex items-center gap-3">
+                <span className={`flex items-center gap-3 ${isSidebarCollapsed ? 'md:justify-center' : ''}`}>
                   <item.icon className="h-4 w-4 shrink-0" />
-                  <span>{item.label}</span>
+                  <span className={isSidebarCollapsed ? 'md:hidden' : ''}>{item.label}</span>
                 </span>
               </NavLink>
             ))}
           </nav>
 
-          <div className="relative mt-10 rounded-xl border border-white/20 bg-white/10 p-4 text-sm backdrop-blur">
-            <p className="font-semibold">{user?.name ?? 'Usuario'}</p>
-            <p className="mt-1 text-cyan-100">{user?.email ?? '-'}</p>
+          <div className={`relative mt-10 rounded-xl border border-white/20 bg-white/10 p-4 text-sm backdrop-blur ${isSidebarCollapsed ? 'md:p-2 md:text-center' : ''}`}>
+            <p className="font-semibold">{isSidebarCollapsed ? (user?.name?.charAt(0) ?? 'U') : (user?.name ?? 'Usuario')}</p>
+            <p className={`mt-1 text-cyan-100 ${isSidebarCollapsed ? 'md:hidden' : ''}`}>{user?.email ?? '-'}</p>
             <button
               type="button"
               onClick={handleLogout}
+              title="Sair"
               className="mt-4 w-full rounded-lg bg-white px-3 py-2 text-sm font-semibold text-sky-800 transition hover:bg-cyan-50"
             >
-              Sair
+              {isSidebarCollapsed ? 'S' : 'Sair'}
             </button>
           </div>
         </aside>
