@@ -141,5 +141,9 @@ class DatabaseSeeder extends Seeder
             'end_date' => Carbon::today()->endOfMonth()->toDateString(),
             'status' => 'active',
         ]);
+
+        $this->callWith(AcademicSeeder::class, [
+            'user' => $user,
+        ]);
     }
 }
